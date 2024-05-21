@@ -15,8 +15,8 @@ detach-up:
 
 # Forcing all containers to stop
 stop:
-	docker stop postgres_container pgadmin_container
-	docker rm postgres_container pgadmin_container
+	docker stop postgres_container pgadmin_container || true
+	docker rm postgres_container pgadmin_container || true
 
 # Delete service container images
 rmi:
