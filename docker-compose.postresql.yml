@@ -1,0 +1,59 @@
+
+version: "3.9"
+
+services:
+
+  postgres:
+    container_name: postgres_container
+    image: postgres:14.8-alpine3.18
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_PASSWORD}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 4G
+    networks:
+      - postgresnet
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4:7.2
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD} 
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+    networks:
+      - postgresnet
+
+
+volumes:
+  postres_data:
+  pgadmin_data:
+
+
+networks:
+  postgresnet:
+    driver: bridge
